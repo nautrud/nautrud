@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Редактировать работу — trud.ru{% endblock %}
+{% block content %}
+<div class="container-custom my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <h1 class="fw-bold mb-4 text-center">
+                {% if is_manager_edit %}
+                    Редактировать научную работу (Менеджер)
+                {% else %}
+                    Редактировать научную работу
+                {% endif %}
+            </h1>
+            
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'main' %}" class="text-decoration-none">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'works' %}" class="text-decoration-none">Научные работы</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'work_detail' work.id %}" class="text-decoration-none">{{ work.name|truncatechars:30 }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Редактировать</li>
+                </ol>
+            </nav>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Display form errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger mb-4">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">{{ form.name.label }}</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.name.help_text %}
+                                    <div class="form-text">{{ form.name.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.short_description.id_for_label }}" class="form-label fw-semibold">{{ form.short_description.label }}</label>
+                                {{ form.short_description }}
+                                {% if form.short_description.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.short_description.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.short_description.help_text %}
+                                    <div class="form-text">{{ form.short_description.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.long_description.id_for_label }}" class="form-label fw-semibold">{{ form.long_description.label }}</label>
+                                {{ form.long_description }}
+                                {% if form.long_description.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.long_description.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.long_description.help_text %}
+                                    <div class="form-text">{{ form.long_description.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.tags.id_for_label }}" class="form-label fw-semibold">{{ form.tags.label }}</label>
+                                {{ form.tags }}
+                                {% if form.tags.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.tags.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.tags.help_text %}
+                                    <div class="form-text">{{ form.tags.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.cover_image.id_for_label }}" class="form-label fw-semibold">{{ form.cover_image.label }}</label>
+                                {% if work.cover_image %}
+                                    <div class="mb-3">
+                                        <p class="text-muted small mb-2">Текущая обложка:</p>
+                                        <img src="{{ work.cover_image.url }}" alt="Текущая обложка" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                                    </div>
+                                {% endif %}
+                                {{ form.cover_image }}
+                                {% if form.cover_image.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.cover_image.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.cover_image.help_text %}
+                                    <div class="form-text">{{ form.cover_image.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.pdf_file.id_for_label }}" class="form-label fw-semibold">{{ form.pdf_file.label }}</label>
+                                {% if work.pdf_file %}
+                                    <div class="mb-3">
+                                        <p class="text-muted small mb-2">Текущий PDF файл:</p>
+                                        <a href="{{ work.pdf_file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i>Просмотреть текущий PDF
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {{ form.pdf_file }}
+                                {% if form.pdf_file.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.pdf_file.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.pdf_file.help_text %}
+                                    <div class="form-text">{{ form.pdf_file.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'work_detail' work.id %}" class="btn btn-outline-secondary me-md-2">Отмена</a>
+                            <button type="submit" class="btn btn-primary custom-main">Сохранить изменения</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Guidelines Section -->
+            <div class="mt-5">
+                <h3 class="fw-bold mb-3">Рекомендации по редактированию</h3>
+                <div class="row g-4">
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title fw-semibold mb-3">📝 Что можно изменить</h5>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">• Название и описания работы</li>
+                                    <li class="mb-2">• Теги и категории</li>
+                                    <li class="mb-2">• Обложку работы</li>
+                                    <li class="mb-2">• PDF файл</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title fw-semibold mb-3">⚠️ Важные моменты</h5>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">• Изменения сохранят историю публикации</li>
+                                    <li class="mb-2">• Новые файлы заменят старые</li>
+                                    <li class="mb-2">• Проверьте все поля перед сохранением</li>
+                                    <li class="mb-2">• Отмена вернет к просмотру работы</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

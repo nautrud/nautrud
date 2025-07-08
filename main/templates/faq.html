@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}FAQ — trud.ru{% endblock %}
+{% block content %}
+<div class="container-fluid my-5 px-0">
+    <h1 class="fw-bold mb-4 text-center">Часто задаваемые вопросы (FAQ)</h1>
+    <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faq1">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                    Как опубликовать свою научную работу на trud.ru?
+                </button>
+            </h2>
+            <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Для публикации работы необходимо зарегистрироваться или войти в свой аккаунт, затем перейти на страницу «Опубликовать свою работу» и заполнить форму с описанием и файлом работы.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faq2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                    Кто может просматривать опубликованные работы?
+                </button>
+            </h2>
+            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Все пользователи платформы могут просматривать опубликованные работы, а также искать их по названию, автору или тематике.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faq3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                    Как изменить или удалить свою работу?
+                </button>
+            </h2>
+            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Для редактирования или удаления работы войдите в свой профиль, выберите нужную работу и используйте соответствующие кнопки для изменения или удаления.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faq4">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                    Как связаться с поддержкой?
+                </button>
+            </h2>
+            <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="faq4" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Вы можете воспользоваться формой обратной связи на странице «Обратная связь» или написать на электронную почту info@trud.ru.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faq5">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                    Можно ли опубликовать работу, если я не являюсь студентом или преподавателем университета?
+                </button>
+            </h2>
+            <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="faq5" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Публикация работ доступна только для студентов и преподавателей Московского Университета имени С.Ю.Витте. Просматривать работы могут все пользователи.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faq6">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
+                    Как добавить работу в тематический сборник?
+                </button>
+            </h2>
+            <div id="collapse6" class="accordion-collapse collapse" aria-labelledby="faq6" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Добавление работы в сборник осуществляется администратором платформы. Если ваша работа подходит для определённой тематики, вы можете связаться с поддержкой.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

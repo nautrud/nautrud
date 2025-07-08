@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block title %}Все работы — trud.ru{% endblock %}
+{% block content %}
+<div class="container-custom my-5">
+    <h1 class="fw-bold mb-4 text-center">Все научные работы</h1>
+    
+    <!-- View Selector -->
+    <div class="d-flex justify-content-center mb-4">
+        <div class="view-selector-container">
+            <a href="?view=works{% if search_query %}&q={{ search_query }}{% endif %}" 
+               class="view-selector-item {% if view_type == 'works' %}active{% endif %}">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Работы</span>
+            </a>
+            <a href="?view=collections{% if search_query %}&q={{ search_query }}{% endif %}" 
+               class="view-selector-item {% if view_type == 'collections' %}active{% endif %}">
+                <i class="bi bi-collection"></i>
+                <span>Коллекции</span>
+            </a>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-end mb-4 search-form">
+        <form method="get" class="d-flex" style="max-width: 400px;">
+            <input type="hidden" name="view" value="{{ view_type }}">
+            <input type="text" name="q" class="form-control me-2" style="max-width:320px;" 
+                   placeholder="{% if view_type == 'collections' %}Поиск по названию, создателю, тегам...{% else %}Поиск по названию, автору, тегам...{% endif %}" 
+                   value="{{ search_query|default:'' }}">
+            <button type="submit" class="btn btn-outline-primary custom-main">Найти</button>
+        </form>
+    </div>
+    
+    {% if view_type == 'collections' %}
+        {% if collections %}
+            <div class="row g-4">
+                {% for collection in collections %}
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                    <div class="card h-100 work-card">
+                        <a href="{% url 'view_collection' collection.id %}" class="text-decoration-none">
+                            <div class="ratio ratio-4x3 work-card-img-wrapper rounded-top">
+                                {% if collection.cover_image %}
+                                    <img src="{{ collection.cover_image.url }}" class="card-img-top object-fit-cover rounded-top" alt="{{ collection.name }} cover" loading="lazy">
+                                {% else %}
+                                    <img src="https://placehold.co/400x300?text=Collection+{{ forloop.counter }}" class="card-img-top object-fit-cover rounded-top" alt="{{ collection.name }} cover" loading="lazy">
+                                {% endif %}
+                            </div>
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title mb-1">
+                                <a href="{% url 'view_collection' collection.id %}" class="text-decoration-none text-dark">{{ collection.name }}</a>
+                            </h5>
+                            <div class="mb-2 text-muted small">{{ collection.created_at|date:"d.m.Y" }}</div>
+                            <div class="mb-2 fw-semibold">
+                                <a href="{% url 'user_profile' collection.created_by.id %}" class="work-author-link">{{ collection.created_by.surname }} {{ collection.created_by.name }}</a>
+                            </div>
+                            <p class="card-text mb-3">{{ collection.description|truncatechars:100 }}</p>
+                            {% if collection.tags %}
+                            <div class="mb-2">
+                                {% for tag in collection.tags|split_tags %}
+                                    <span class="badge bg-light text-dark me-1 mb-1">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-collection text-muted me-1"></i>
+                                    <small class="text-muted">{{ collection.collection_works.count }} работ</small>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-calendar text-muted me-1"></i>
+                                    <small class="text-muted">{{ collection.created_at|date:"d.m.Y" }}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 mt-auto">
+                                <a href="{% url 'view_collection' collection.id %}" class="btn btn-primary custom-main">Просмотреть</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <h3 class="text-muted">Коллекции не найдены</h3>
+                {% if search_query %}
+                    <p class="text-muted">По запросу "{{ search_query }}" ничего не найдено.</p>
+                    <a href="?view=collections" class="btn btn-primary custom-main">Показать все коллекции</a>
+                {% else %}
+                    <p class="text-muted">В базе данных пока нет коллекций.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        {% if works %}
+            <div class="row g-4">
+                {% for work in works %}
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                    <div class="card h-100 work-card">
+                        <a href="{% url 'work_detail' work.id %}" class="text-decoration-none">
+                            <div class="ratio ratio-4x3 work-card-img-wrapper rounded-top">
+                                {% if work.cover_image %}
+                                    <img src="{{ work.cover_image.url }}" class="card-img-top object-fit-cover rounded-top" alt="{{ work.name }} cover" loading="lazy">
+                                {% else %}
+                                    <img src="https://placehold.co/400x300?text=Cover+{{ forloop.counter }}" class="card-img-top object-fit-cover rounded-top" alt="{{ work.name }} cover" loading="lazy">
+                                {% endif %}
+                            </div>
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title mb-1">
+                                <a href="{% url 'work_detail' work.id %}" class="text-decoration-none text-dark">{{ work.name }}</a>
+                            </h5>
+                            <div class="mb-2 text-muted small">{{ work.date_published|date:"d.m.Y" }}</div>
+                            <div class="mb-2 fw-semibold">
+                                <a href="{% url 'user_profile' work.author.id %}" class="work-author-link">{{ work.author.surname }} {{ work.author.name }}</a>
+                            </div>
+                            <p class="card-text mb-3">{{ work.short_description }}</p>
+                            {% if work.tags %}
+                            <div class="mb-2">
+                                {% for tag in work.tags|split_tags %}
+                                    <span class="badge bg-light text-dark me-1 mb-1">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-eye text-muted me-1"></i>
+                                    <small class="text-muted">{{ work.views|default:"0" }}</small>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-heart text-muted me-1"></i>
+                                    <small class="text-muted">{{ work.likes|default:"0" }}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 mt-auto">
+                                <a href="{% url 'work_detail' work.id %}" class="btn btn-primary custom-main">Читать работу</a>
+                                {% if work.pdf_file %}
+                                    <a href="{{ work.pdf_file.url }}" class="btn btn-outline-primary custom-main" target="_blank" download>
+                                        📄 PDF
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <h3 class="text-muted">Работы не найдены</h3>
+                {% if search_query %}
+                    <p class="text-muted">По запросу "{{ search_query }}" ничего не найдено.</p>
+                    <a href="?view=works" class="btn btn-primary custom-main">Показать все работы</a>
+                {% else %}
+                    <p class="text-muted">В базе данных пока нет научных работ.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endif %}
+        
+        <!-- Pagination -->
+        {% if view_type == 'collections' %}
+            {% if collections.has_other_pages %}
+            <nav class="mt-5 d-flex justify-content-center" aria-label="Навигация по страницам">
+                <ul class="pagination custom-pagination">
+                    {% if collections.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?view=collections&page={{ collections.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">&laquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+                    
+                    {% for num in collections.paginator.page_range %}
+                        {% if collections.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > collections.number|add:'-3' and num < collections.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?view=collections&page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if collections.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?view=collections&page={{ collections.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">&raquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            {% if works.has_other_pages %}
+            <nav class="mt-5 d-flex justify-content-center" aria-label="Навигация по страницам">
+                <ul class="pagination custom-pagination">
+                    {% if works.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?view=works&page={{ works.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">&laquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+                    
+                    {% for num in works.paginator.page_range %}
+                        {% if works.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > works.number|add:'-3' and num < works.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?view=works&page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if works.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?view=works&page={{ works.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">&raquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<script src="//code.jivosite.com/widget/R6xgANsFnA" async></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}trud.ru{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=circe:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    <style>
+        /* Make username dropdown bigger */
+        .navbar-nav .dropdown-toggle {
+            font-size: 1.15rem;
+            padding: 0.75rem 1.5rem;
+        }
+        .dropdown-menu {
+            font-size: 1.08rem;
+            min-width: 240px;
+            padding: 0.5rem 0.25rem;
+        }
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+        }
+        /* Removed hover-to-open dropdown */
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom mb-4">
+        <div class="container" style="max-width:1280px;">
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="{% url 'main' %}">Главная</a>
+                <a class="nav-link" href="{% url 'about' %}">О нас</a>
+                <a class="nav-link" href="{% url 'works' %}">Все работы</a>
+            </div>
+            <a class="navbar-brand fw-bold fs-2 mx-auto" href="{% url 'main' %}">trud.ru</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'feedback' %}">Обратная связь</a>
+                <a class="nav-link" href="{% url 'contacts' %}">Контакты</a>
+                <a class="nav-link" href="{% url 'faq' %}">FAQ</a>
+                {% if user.is_authenticated %}
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button">
+                            {{ user.name }} {{ user.surname }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}">Профиль</a></li>
+                            <li><a class="dropdown-item" href="{% url 'upload' %}">Опубликовать работу</a></li>
+                            {% if user.role == 'administrator' %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_panel' %}">
+                                    <i class="bi bi-gear"></i> Панель администратора
+                                </a></li>
+                            {% elif user.role == 'manager' %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'manager_panel' %}">
+                                    <i class="bi bi-gear"></i> Панель управления
+                                </a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Выйти</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">Войти</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Display messages -->
+    {% if messages %}
+        <div class="container-custom">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show mb-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <main class="container-custom mb-5">
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer class="text-center py-3 border-top w-100 mt-auto">
+        © Московский Университет имени С.Ю.Витте 2025
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

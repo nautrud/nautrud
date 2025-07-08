@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Редактировать коллекцию{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-pencil-square"></i> Редактировать коллекцию
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label">
+                                        <strong>{{ form.name.label }} *</strong>
+                                    </label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.name.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% if form.name.help_text %}
+                                        <div class="form-text">{{ form.name.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.tags.id_for_label }}" class="form-label">
+                                        <strong>{{ form.tags.label }}</strong>
+                                    </label>
+                                    {{ form.tags }}
+                                    {% if form.tags.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.tags.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% if form.tags.help_text %}
+                                        <div class="form-text">{{ form.tags.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <strong>{{ form.description.label }}</strong>
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if form.description.help_text %}
+                                <div class="form-text">{{ form.description.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.cover_image.id_for_label }}" class="form-label">
+                                <strong>{{ form.cover_image.label }}</strong>
+                            </label>
+                            {{ form.cover_image }}
+                            {% if form.cover_image.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.cover_image.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if form.cover_image.help_text %}
+                                <div class="form-text">{{ form.cover_image.help_text }}</div>
+                            {% endif %}
+                            
+                            <!-- Current cover image display -->
+                            {% if collection.cover_image %}
+                                <div class="mt-2">
+                                    <p class="text-muted small mb-1">Текущая обложка:</p>
+                                    <img src="{{ collection.cover_image.url }}" alt="Current cover" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #dee2e6;">
+                                </div>
+                            {% endif %}
+                            
+                            <!-- New cover image preview -->
+                            <div id="cover-preview" class="mt-2" style="display: none;">
+                                <p class="text-muted small mb-1">Новая обложка:</p>
+                                <img id="preview-image" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <strong>Выберите работы для коллекции</strong>
+                            </label>
+                            {% if available_works %}
+                                <div class="mb-3">
+                                    <input type="text" id="workSearch" class="form-control" placeholder="Поиск работ по названию, автору, тегам...">
+                                </div>
+                                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;" id="worksContainer">
+                                    {% for work in available_works %}
+                                    <div class="form-check mb-2 work-item" data-work-name="{{ work.name|lower }}" data-work-author="{{ work.author.surname|lower }} {{ work.author.name|lower }}" data-work-tags="{{ work.tags|lower|default:'' }}">
+                                        <input class="form-check-input" type="checkbox" name="works" 
+                                               value="{{ work.id }}" id="work_{{ work.id }}"
+                                               {% if work.id in selected_work_ids %}checked{% endif %}>
+                                        <label class="form-check-label" for="work_{{ work.id }}">
+                                            <strong>{{ work.name }}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                Автор: {{ work.author.surname }} {{ work.author.name }} | 
+                                                {{ work.date_published|date:"d.m.Y" }}
+                                            </small>
+                                            {% if work.tags %}
+                                                <br>
+                                                <small class="text-muted">
+                                                    {% for tag in work.tags|split_tags %}
+                                                        <span class="badge bg-light text-dark me-1">{{ tag }}</span>
+                                                    {% endfor %}
+                                                </small>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted mb-0">Нет доступных работ для добавления в коллекцию.</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'manager_panel' %}" class="btn btn-secondary me-md-2">
+                                <i class="bi bi-arrow-left"></i> Отмена
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Сохранить изменения
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('workSearch');
+    const worksContainer = document.getElementById('worksContainer');
+    const workItems = document.querySelectorAll('.work-item');
+    const coverInput = document.getElementById('collection-cover-upload');
+    const coverPreview = document.getElementById('cover-preview');
+    const previewImage = document.getElementById('preview-image');
+    
+    // Cover image preview
+    if (coverInput) {
+        coverInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    coverPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                coverPreview.style.display = 'none';
+            }
+        });
+    }
+    
+    // Work search functionality
+    if (searchInput && worksContainer) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            workItems.forEach(function(item) {
+                const workName = item.getAttribute('data-work-name');
+                const workAuthor = item.getAttribute('data-work-author');
+                const workTags = item.getAttribute('data-work-tags');
+                
+                const matchesSearch = workName.includes(searchTerm) || 
+                                    workAuthor.includes(searchTerm) || 
+                                    workTags.includes(searchTerm);
+                
+                if (searchTerm === '' || matchesSearch) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %} 

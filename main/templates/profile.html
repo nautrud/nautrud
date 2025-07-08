@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Профиль - {{ profile_user.name }} {{ profile_user.surname }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Profile Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="profile-header">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <div class="profile-avatar mb-3">
+                            <div class="avatar-placeholder">
+                                <span class="avatar-initials">{{ profile_user.name|first|upper }}{{ profile_user.surname|first|upper }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="profile-info">
+                            <h3 class="mb-2 d-flex align-items-center">
+                                {{ profile_user.name }} {{ profile_user.surname }}
+                                {% if not is_own_profile and user.is_authenticated and user.role == 'administrator' %}
+                                    <form method="post" action="" class="ms-3 d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="set_manager_role">
+                                        <input type="hidden" name="user_id" value="{{ profile_user.id }}">
+                                        {% if profile_user.role == 'manager' %}
+                                            <input type="hidden" name="make_manager" value="0">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Сделать пользователем</button>
+                                        {% elif profile_user.role == 'user' %}
+                                            <input type="hidden" name="make_manager" value="1">
+                                            <button type="submit" class="btn btn-outline-success btn-sm">Сделать менеджером</button>
+                                        {% endif %}
+                                    </form>
+                                {% endif %}
+                            </h3>
+                            {% if is_own_profile %}
+                                <p class="text-muted mb-1">
+                                    <i class="bi bi-envelope"></i> {{ profile_user.email }}
+                                </p>
+                                {% if profile_user.student_number %}
+                                    <p class="text-muted mb-1">
+                                        <i class="bi bi-person-badge"></i> №{{ profile_user.student_number }}
+                                    </p>
+                                {% endif %}
+                                <p class="text-muted mb-3">
+                                    <i class="bi bi-calendar"></i> Зарегистрирован 
+                                    {% if profile_user.date_joined %}
+                                        {{ profile_user.date_joined|date:"d.m.Y" }}
+                                    {% else %}
+                                        Недавно
+                                    {% endif %}
+                                </p>
+                                <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary">
+                                    <i class="bi bi-pencil"></i> Редактировать профиль
+                                </a>
+                            {% else %}
+                                <p class="text-muted mb-3">
+                                    <i class="bi bi-calendar"></i> Зарегистрирован 
+                                    {% if profile_user.date_joined %}
+                                        {{ profile_user.date_joined|date:"d.m.Y" }}
+                                    {% else %}
+                                        Недавно
+                                    {% endif %}
+                                </p>
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-person"></i> Мой профиль
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="profile-stats">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="stat-card text-center p-2 border rounded">
+                                        <div class="stat-number">{{ total_works }}</div>
+                                        <div class="stat-label">Работ</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card text-center p-2 border rounded">
+                                        <div class="stat-number">{{ total_views }}</div>
+                                        <div class="stat-label">Просмотров</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card text-center p-2 border rounded">
+                                        <div class="stat-number">{{ total_likes }}</div>
+                                        <div class="stat-label">Лайков</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User's Works -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>{% if is_own_profile %}Мои работы{% else %}Работы {{ profile_user.name }} {{ profile_user.surname }}{% endif %}</h4>
+                {% if is_own_profile %}
+                    <a href="{% url 'upload' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Добавить работу
+                    </a>
+                {% endif %}
+            </div>
+            
+            {% if user_works %}
+                <div class="row">
+                    {% for work in user_works %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 work-card">
+                            {% if work.cover_image %}
+                                <img src="{{ work.cover_image.url }}" class="card-img-top" alt="{{ work.name }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-file-earmark-text" style="font-size: 3rem; color: #6c757d;"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="card-body">
+                                <h5 class="card-title">{{ work.name }}</h5>
+                                <p class="card-text text-muted">{{ work.short_description|truncatechars:100 }}</p>
+                                
+                                {% if work.tags %}
+                                    <div class="mb-2">
+                                        {% for tag in work.tags|split:","|slice:":3" %}
+                                            <span class="badge bg-secondary me-1">{{ tag|strip }}</span>
+                                        {% endfor %}
+                                        {% if work.tags|split:","|length > 3 %}
+                                            <span class="badge bg-secondary">+{{ work.tags|split:","|length|add:"-3" }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="work-stats mb-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-eye"></i> {{ work.views }}
+                                        <i class="bi bi-heart ms-2"></i> {{ work.likes }}
+                                        <span class="ms-2">{{ work.date_published|date:"d.m.Y" }}</span>
+                                    </small>
+                                </div>
+                                
+                                <div class="btn-group w-100" role="group">
+                                    <a href="{% url 'work_detail' work.id %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye"></i> Просмотр
+                                    </a>
+                                    {% if is_own_profile %}
+                                        <a href="{% url 'edit_work' work.id %}" class="btn btn-outline-secondary btn-sm">
+                                            <i class="bi bi-pencil"></i> Изменить
+                                        </a>
+                                        <a href="{% url 'delete_work' work.id %}" class="btn btn-outline-danger btn-sm" 
+                                           onclick="return confirm('Вы уверены, что хотите удалить эту работу?')">
+                                            <i class="bi bi-trash"></i> Удалить
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-file-earmark-text" style="font-size: 4rem; color: #6c757d;"></i>
+                    <h5 class="mt-3">
+                        {% if is_own_profile %}
+                            У вас пока нет работ
+                        {% else %}
+                            У {{ profile_user.name }} пока нет работ
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted">
+                        {% if is_own_profile %}
+                            Начните с загрузки вашей первой научной работы
+                        {% else %}
+                            Этот пользователь еще не опубликовал ни одной работы
+                        {% endif %}
+                    </p>
+                    {% if is_own_profile %}
+                        <a href="{% url 'upload' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Загрузить работу
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %} 

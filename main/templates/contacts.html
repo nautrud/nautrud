@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Контакты — trud.ru{% endblock %}
+{% block content %}
+<div class="d-flex min-vh-100 align-items-center justify-content-center">
+    <div class="container-custom" style="max-width: 900px;">
+        <h1 class="fw-bold mb-4 text-center">Контакты</h1>
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="h5 fw-bold mb-1">Наш адрес</h2>
+                <p class="mb-2 mt-1"><strong>115432, Москва, 2-й Кожуховский проезд, д. 12, стр. 1</strong></p>
+                <div class="mb-3">
+                    <span class="d-block mb-1 text-muted">Электронная почта:</span>
+                    <a href="mailto:info@trud.ru">info@trud.ru</a>
+                </div>
+                <div class="mb-3">
+                    <span class="d-block mb-1 text-muted">Телефон:</span>
+                    <a href="tel:+74951234567">+7 (495) 123-45-67</a>
+                </div>
+                <div class="mb-3">
+                    <span class="d-block mb-1 text-muted">Часы работы:</span>
+                    <span>Пн–Пт: 09:00–18:00</span>
+                </div>
+                <div class="mb-3">
+                    <span class="d-block mb-1 text-muted">Как добраться:</span>
+                    <span>Ближайшее метро — Автозаводская, 10 минут пешком.</span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="rounded-4 overflow-hidden shadow-sm border">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2248.343428867511!2d37.65245407640397!3d55.70040199602649!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x414ab4b509be5f4b%3A0x4823f06ba9c0210f!2zMi3QuSDQmtC-0LbRg9GF0L7QstGB0LrQuNC5INC_0YAt0LQsIDEyINGB0YLRgNC-0LXQvdC40LUgMSwg0JzQvtGB0LrQstCwLCDQoNC-0YHRgdC40Y8sIDExNTQzMg!5e0!3m2!1sru!2str!4v1749139498553!5m2!1sru!2str" width="100%" height="400" style="border: 0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Google Maps — Москва"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

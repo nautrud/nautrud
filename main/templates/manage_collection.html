@@ -1,0 +1,398 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Управление коллекцией - {{ collection.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="collection-header-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="mb-2"><i class="bi bi-collection"></i> {{ collection.name }}</h2>
+                        {% if collection.description %}
+                            <p class="text-muted mb-2">{{ collection.description }}</p>
+                        {% endif %}
+                        {% if collection.tags %}
+                            <div class="mb-2">
+                                {% for tag in collection.tags|split_tags %}
+                                    <span class="badge bg-light text-dark me-1">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{% url 'manager_panel' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Назад к панели
+                            </a>
+                            <a href="{% url 'view_collection' collection.id %}" class="btn btn-outline-info" target="_blank">
+                                <i class="bi bi-eye"></i> Публичный вид
+                            </a>
+                            <a href="{% url 'edit_collection' collection.id %}" class="btn btn-outline-warning">
+                                <i class="bi bi-pencil"></i> Редактировать
+                            </a>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCollectionModal">
+                                <i class="bi bi-trash"></i> Удалить коллекцию
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Works in Collection -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-file-earmark-text"></i> Работы в коллекции ({{ collection_works.count }})
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if collection_works %}
+                        <div class="row">
+                            {% for collection_work in collection_works %}
+                            <div class="col-md-6 mb-3">
+                                <div class="work-item-card border rounded p-3">
+                                    <div class="d-flex align-items-start">
+                                        {% if collection_work.work.cover_image %}
+                                            <img src="{{ collection_work.work.cover_image.url }}" class="me-3" alt="{{ collection_work.work.name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                        {% else %}
+                                            <div class="bg-light me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 4px;">
+                                                <i class="bi bi-file-earmark-text text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <a href="{% url 'work_detail' collection_work.work.id %}" class="text-decoration-none">
+                                                    {{ collection_work.work.name }}
+                                                </a>
+                                            </h6>
+                                            <p class="text-muted small mb-1">{{ collection_work.work.short_description|truncatechars:80 }}</p>
+                                            <small class="text-muted">
+                                                Автор: {{ collection_work.work.author.name }} {{ collection_work.work.author.surname }}
+                                            </small>
+                                        </div>
+                                        <form method="post" class="ms-2">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="remove_work">
+                                            <input type="hidden" name="work_id" value="{{ collection_work.work.id }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="return confirm('Удалить работу из коллекции?')" title="Удалить из коллекции">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-file-earmark-text text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3 text-muted">Коллекция пуста</h5>
+                            <p class="text-muted">Добавьте работы в коллекцию, используя форму справа</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Works to Collection -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Добавить работы
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if available_works %}
+                        <!-- Search Box -->
+                        <div class="mb-3">
+                            <label for="workSearch" class="form-label">Поиск работ:</label>
+                            <input type="text" class="form-control" id="workSearch" placeholder="Введите название работы или автора...">
+                        </div>
+                        
+                        <!-- Works List -->
+                        <div class="works-list-container" style="max-height: 400px; overflow-y: auto;">
+                            <form method="post" id="addWorksForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="add_work">
+                                
+                                <div class="works-list">
+                                    {% for work in available_works|slice:":3" %}
+                                    <div class="work-item-selectable border rounded p-2 mb-2" data-work-id="{{ work.id }}">
+                                        <div class="d-flex align-items-start">
+                                            {% if work.cover_image %}
+                                                <img src="{{ work.cover_image.url }}" class="me-2" alt="{{ work.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                            {% else %}
+                                                <div class="bg-light me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; border-radius: 4px;">
+                                                    <i class="bi bi-file-earmark-text text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1 work-title">{{ work.name }}</h6>
+                                                <p class="text-muted small mb-1">{{ work.short_description|truncatechars:60 }}</p>
+                                                <small class="text-muted work-author">
+                                                    Автор: {{ work.author.name }} {{ work.author.surname }}
+                                                </small>
+                                            </div>
+                                            <div class="ms-2">
+                                                <input type="checkbox" class="form-check-input work-checkbox" name="selected_works" value="{{ work.id }}" id="work_{{ work.id }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <button type="submit" class="btn btn-primary w-100" id="addSelectedBtn" disabled>
+                                        <i class="bi bi-plus-circle"></i> Добавить выбранные работы
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Show More Button -->
+                        {% if available_works.count > 3 %}
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="showMoreBtn">
+                                <i class="bi bi-chevron-down"></i> Показать еще работы
+                            </button>
+                        </div>
+                        {% endif %}
+                        
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                            <p class="text-muted mt-2 mb-0">Все работы уже добавлены в коллекцию</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Collection Info -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Информация о коллекции
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Создана:</strong> {{ collection.created_at|date:"d.m.Y H:i" }}</p>
+                    <p class="mb-2"><strong>Работ в коллекции:</strong> {{ collection_works.count }}</p>
+                    <p class="mb-2"><strong>Доступно для добавления:</strong> {{ available_works.count }}</p>
+                    {% if collection.tags %}
+                        <p class="mb-0"><strong>Теги:</strong></p>
+                        <div class="mb-0">
+                            {% for tag in collection.tags|split_tags %}
+                                <span class="badge bg-light text-dark me-1">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Collection Modal -->
+<div class="modal fade" id="deleteCollectionModal" tabindex="-1" aria-labelledby="deleteCollectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCollectionModalLabel">Удалить коллекцию</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить коллекцию <strong>"{{ collection.name }}"</strong>?</p>
+                <p class="text-danger mb-0">Это действие нельзя отменить. Все связи с работами будут удалены.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete_collection">
+                    <button type="submit" class="btn btn-danger">Удалить коллекцию</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.collection-header-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+.work-item-card {
+    background: #ffffff;
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6 !important;
+}
+
+.work-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-color: #007bff !important;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.btn {
+    border-radius: 0.375rem;
+}
+
+@media (max-width: 768px) {
+    .collection-header-card .row {
+        text-align: center;
+    }
+    
+    .collection-header-card .col-md-4 {
+        margin-top: 1rem;
+    }
+}
+
+/* Works selection styles */
+.work-item-selectable {
+    background: #ffffff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid #dee2e6 !important;
+}
+
+.work-item-selectable:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff !important;
+}
+
+.work-item-selectable.selected {
+    background-color: #e3f2fd;
+    border-color: #007bff !important;
+}
+
+.work-item-selectable.hidden {
+    display: none;
+}
+
+.works-list-container {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa;
+}
+
+.works-list {
+    padding: 0.5rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const workSearch = document.getElementById('workSearch');
+    const worksList = document.querySelector('.works-list');
+    const workItems = document.querySelectorAll('.work-item-selectable');
+    const addSelectedBtn = document.getElementById('addSelectedBtn');
+    const showMoreBtn = document.getElementById('showMoreBtn');
+    const workCheckboxes = document.querySelectorAll('.work-checkbox');
+    
+    // Search functionality
+    if (workSearch) {
+        workSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            workItems.forEach(item => {
+                const title = item.querySelector('.work-title').textContent.toLowerCase();
+                const author = item.querySelector('.work-author').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || author.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        });
+    }
+    
+    // Work item selection
+    workItems.forEach(item => {
+        const checkbox = item.querySelector('.work-checkbox');
+        
+        // Click on item to select/deselect
+        item.addEventListener('click', function(e) {
+            if (e.target !== checkbox) {
+                checkbox.checked = !checkbox.checked;
+                updateSelection();
+            }
+        });
+        
+        // Click on checkbox
+        checkbox.addEventListener('change', function() {
+            updateSelection();
+        });
+    });
+    
+    // Update selection state
+    function updateSelection() {
+        const checkedBoxes = document.querySelectorAll('.work-checkbox:checked');
+        addSelectedBtn.disabled = checkedBoxes.length === 0;
+        
+        workItems.forEach(item => {
+            const checkbox = item.querySelector('.work-checkbox');
+            if (checkbox.checked) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+    
+    // Show more works functionality
+    if (showMoreBtn) {
+        showMoreBtn.addEventListener('click', function() {
+            // This would typically load more works via AJAX
+            // For now, we'll just show a message
+            this.innerHTML = '<i class="bi bi-check"></i> Все работы показаны';
+            this.disabled = true;
+            this.classList.remove('btn-outline-secondary');
+            this.classList.add('btn-success');
+        });
+    }
+    
+    // Form submission
+    const addWorksForm = document.getElementById('addWorksForm');
+    if (addWorksForm) {
+        addWorksForm.addEventListener('submit', function(e) {
+            const checkedBoxes = document.querySelectorAll('.work-checkbox:checked');
+            if (checkedBoxes.length === 0) {
+                e.preventDefault();
+                alert('Пожалуйста, выберите хотя бы одну работу для добавления.');
+                return false;
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

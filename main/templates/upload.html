@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Опубликовать работу — trud.ru{% endblock %}
+{% block content %}
+<div class="container-custom my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <h1 class="fw-bold mb-4 text-center">Опубликовать научную работу</h1>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Display form errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger mb-4">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">{{ form.name.label }}</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.name.help_text %}
+                                    <div class="form-text">{{ form.name.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.short_description.id_for_label }}" class="form-label fw-semibold">{{ form.short_description.label }}</label>
+                                {{ form.short_description }}
+                                {% if form.short_description.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.short_description.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.short_description.help_text %}
+                                    <div class="form-text">{{ form.short_description.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.long_description.id_for_label }}" class="form-label fw-semibold">{{ form.long_description.label }}</label>
+                                {{ form.long_description }}
+                                {% if form.long_description.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.long_description.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.long_description.help_text %}
+                                    <div class="form-text">{{ form.long_description.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.tags.id_for_label }}" class="form-label fw-semibold">{{ form.tags.label }}</label>
+                                {{ form.tags }}
+                                {% if form.tags.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.tags.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.tags.help_text %}
+                                    <div class="form-text">{{ form.tags.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.cover_image.id_for_label }}" class="form-label fw-semibold">{{ form.cover_image.label }}</label>
+                                {{ form.cover_image }}
+                                {% if form.cover_image.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.cover_image.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.cover_image.help_text %}
+                                    <div class="form-text">{{ form.cover_image.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.pdf_file.id_for_label }}" class="form-label fw-semibold">{{ form.pdf_file.label }}</label>
+                                {{ form.pdf_file }}
+                                {% if form.pdf_file.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.pdf_file.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.pdf_file.help_text %}
+                                    <div class="form-text">{{ form.pdf_file.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'works' %}" class="btn btn-outline-secondary me-md-2">Отмена</a>
+                            <button type="submit" class="btn btn-primary custom-main">Опубликовать работу</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Guidelines Section -->
+            <div class="mt-5">
+                <h3 class="fw-bold mb-3">Рекомендации по публикации</h3>
+                <div class="row g-4">
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title fw-semibold mb-3">📝 Структура работы</h5>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">• Четкое и информативное название</li>
+                                    <li class="mb-2">• Краткое описание (до 300 символов)</li>
+                                    <li class="mb-2">• Полное описание с деталями</li>
+                                    <li class="mb-2">• Указание автора и даты</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title fw-semibold mb-3">✅ Лучшие практики</h5>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">• Используйте академический стиль</li>
+                                    <li class="mb-2">• Проверьте орфографию и грамматику</li>
+                                    <li class="mb-2">• Укажите источники и ссылки</li>
+                                    <li class="mb-2">• Добавьте ключевые слова</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

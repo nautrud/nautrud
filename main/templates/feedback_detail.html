@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Обработка обращения{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-chat-dots"></i> Обработка обращения</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Имя</dt>
+                        <dd class="col-sm-8">{{ feedback.name }}</dd>
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">{{ feedback.email }}</dd>
+                        <dt class="col-sm-4">Телефон</dt>
+                        <dd class="col-sm-8">{{ feedback.phone }}</dd>
+                        {% if feedback.student_number %}
+                        <dt class="col-sm-4">Номер студента</dt>
+                        <dd class="col-sm-8">{{ feedback.student_number }}</dd>
+                        {% endif %}
+                        <dt class="col-sm-4">Дата отправки</dt>
+                        <dd class="col-sm-8">{{ feedback.date_submitted|date:"d.m.Y H:i" }}</dd>
+                        <dt class="col-sm-4">Описание</dt>
+                        <dd class="col-sm-8"><pre style="white-space: pre-line;">{{ feedback.description }}</pre></dd>
+                    </dl>
+                    {% if feedback.status == 'new' and not feedback.processing_by %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="process_feedback">
+                            <button type="submit" class="btn btn-success">Взять в обработку</button>
+                            <a href="{% url 'manager_panel' %}" class="btn btn-secondary ms-2">Назад</a>
+                        </form>
+                    {% elif feedback.status == 'processing' and feedback.processing_by == user %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="resolve_feedback">
+                            <button type="submit" class="btn btn-success">Отметить как завершенное</button>
+                            <a href="{% url 'manager_panel' %}" class="btn btn-secondary ms-2">Назад</a>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'manager_panel' %}" class="btn btn-secondary">Назад</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
