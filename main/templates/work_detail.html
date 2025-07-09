@@ -3,7 +3,6 @@
 {% block title %}{{ work.name }} — trud.ru{% endblock %}
 {% block content %}
 <div class="container-custom my-5">
-    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'main' %}" class="text-decoration-none">Главная</a></li>
@@ -13,9 +12,7 @@
     </nav>
 
     <div class="row">
-        <!-- Main Content -->
         <div class="col-12 col-lg-8">
-            <!-- Work Header -->
             <div class="card border-0 shadow-sm mb-4">
                 {% if work.cover_image %}
                 <div class="work-detail-cover">
@@ -26,7 +23,6 @@
                     <h1 class="fw-bold mb-3">{{ work.name }}</h1>
                     <p class="text-muted mb-3">{{ work.short_description }}</p>
                     
-                    <!-- Author Info -->
                     <div class="d-flex align-items-center mb-4">
                         <div class="author-avatar me-3">
                             <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold;">
@@ -46,7 +42,6 @@
                         </div>
                     </div>
                     
-                    <!-- Publication Info -->
                     <div class="row text-muted small mb-4">
                         <div class="col-6">
                             <i class="bi bi-calendar3 me-1"></i>
@@ -60,7 +55,6 @@
                 </div>
             </div>
 
-            <!-- Work Description -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
                     <h3 class="fw-bold mb-3">Описание работы</h3>
@@ -70,7 +64,6 @@
                 </div>
             </div>
 
-            <!-- PDF Viewer -->
             {% if work.pdf_file %}
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
@@ -93,9 +86,7 @@
             {% endif %}
         </div>
 
-        <!-- Sidebar -->
         <div class="col-12 col-lg-4">
-            <!-- Quick Actions -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-3">Действия</h5>
@@ -136,7 +127,6 @@
                 </div>
             </div>
 
-            <!-- Work Stats (Author Only) -->
             {% if user == work.author %}
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
@@ -165,7 +155,6 @@
             </div>
             {% endif %}
 
-            <!-- Author's Other Works -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-3">Другие работы автора</h5>
@@ -197,7 +186,6 @@
                 </div>
             </div>
 
-            <!-- Tags/Categories -->
             {% if work.tags %}
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
@@ -211,7 +199,6 @@
             </div>
             {% endif %}
 
-            <!-- Work's Collections -->
             {% if collections %}
             <div class="card border-0 shadow-sm mb-4 mt-4">
                 <div class="card-body p-4">
@@ -232,7 +219,6 @@
     </div>
 </div>
 
-<!-- JavaScript for interactions -->
 <script>
 
 
@@ -244,7 +230,6 @@ function shareWork() {
             url: window.location.href
         });
     } else {
-        // Fallback: copy to clipboard
         navigator.clipboard.writeText(window.location.href).then(function() {
             alert('Ссылка скопирована в буфер обмена!');
         });

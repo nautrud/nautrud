@@ -6,7 +6,14 @@ from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import Q
 from .models import Work, FeedbackForm, User, Collection, CollectionWork
-from .forms import FeedbackFormForm, UserRegistrationForm, UserLoginForm, WorkUploadForm, CollectionForm
+from .forms import (
+    FeedbackFormForm,
+    UserRegistrationForm,
+    UserLoginForm,
+    WorkUploadForm,
+    CollectionForm,
+    UserProfileForm,
+)
 
 
 # Create your views here.
@@ -21,15 +28,12 @@ def about(request):
 
 
 def works(request):
-    # Get search query and view type
     search_query = request.GET.get("q", "")
-    view_type = request.GET.get("view", "works")  # Default to works view
+    view_type = request.GET.get("view", "works")
 
     if view_type == "collections":
-        # Get all collections from database
         items_list = Collection.objects.all().order_by("-created_at")
 
-        # Apply search filter if query exists
         if search_query:
             items_list = items_list.filter(
                 Q(name__icontains=search_query)
@@ -39,8 +43,7 @@ def works(request):
                 | Q(created_by__surname__icontains=search_query)
             )
 
-        # Pagination
-        paginator = Paginator(items_list, 12)  # 12 collections per page
+        paginator = Paginator(items_list, 12)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
 
@@ -50,10 +53,8 @@ def works(request):
             "view_type": view_type,
         }
     else:
-        # Get all works from database
         items_list = Work.objects.all().order_by("-date_published")
 
-        # Apply search filter if query exists
         if search_query:
             items_list = items_list.filter(
                 Q(name__icontains=search_query)
@@ -61,11 +62,10 @@ def works(request):
                 | Q(long_description__icontains=search_query)
                 | Q(author__name__icontains=search_query)
                 | Q(author__surname__icontains=search_query)
-                | Q(tags__icontains=search_query)  # Add tag search
+                | Q(tags__icontains=search_query)
             )
 
-        # Pagination
-        paginator = Paginator(items_list, 12)  # 12 works per page
+        paginator = Paginator(items_list, 12)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
 
@@ -85,13 +85,13 @@ def work_detail(request, work_id):
         messages.error(request, "Работа не найдена.")
         return redirect("works")
 
-    # Increment view count (only for non-authors to avoid self-inflation)
     if not request.user.is_authenticated or work.author != request.user:
         work.views += 1
         work.save(update_fields=["views"])
 
-    # Get collections containing this work
-    collections = [cw.collection for cw in work.work_collections.select_related('collection').all()]
+    collections = [
+        cw.collection for cw in work.work_collections.select_related("collection").all()
+    ]
 
     context = {
         "work": work,
@@ -109,7 +109,6 @@ def edit_work(request, work_id):
         messages.error(request, "Работа не найдена.")
         return redirect("works")
 
-    # Check if user is the author of the work
     if work.author != request.user:
         messages.error(request, "У вас нет прав для редактирования этой работы.")
         return redirect("work_detail", work_id=work_id)
@@ -148,7 +147,6 @@ def delete_work(request, work_id):
         messages.error(request, "Работа не найдена.")
         return redirect("works")
 
-    # Check if user is the author of the work
     if work.author != request.user:
         messages.error(request, "У вас нет прав для удаления этой работы.")
         return redirect("work_detail", work_id=work_id)
@@ -180,12 +178,10 @@ def like_work(request, work_id):
         messages.error(request, "Работа не найдена.")
         return redirect("works")
 
-    # Check if user is trying to like their own work
     if work.author == request.user:
         messages.warning(request, "Вы не можете лайкнуть свою собственную работу.")
         return redirect("work_detail", work_id=work_id)
 
-    # Toggle like (simple implementation - just increment for now)
     work.likes += 1
     work.save(update_fields=["likes"])
     messages.success(request, "Спасибо за лайк!")
@@ -194,31 +190,33 @@ def like_work(request, work_id):
 
 
 def profile(request, user_id=None):
-    # If no user_id provided, show current user's profile
     profile_user = request.user
     if user_id:
         profile_user = User.objects.get(id=user_id)
 
-    # Handle admin role change
-    if request.method == 'POST' and request.user.is_authenticated and request.user.role == 'administrator':
-        if request.POST.get('action') == 'set_manager_role':
-            make_manager = request.POST.get('make_manager') == '1'
+    if (
+        request.method == "POST"
+        and request.user.is_authenticated
+        and request.user.role == "administrator"
+    ):
+        if request.POST.get("action") == "set_manager_role":
+            make_manager = request.POST.get("make_manager") == "1"
             try:
                 if make_manager:
-                    profile_user.role = 'manager'
+                    profile_user.role = "manager"
                 else:
-                    profile_user.role = 'user'
+                    profile_user.role = "user"
                 profile_user.save()
             except Exception:
                 pass
             from django.urls import reverse
-            return redirect(reverse('user_profile', args=[profile_user.id]))
+
+            return redirect(reverse("user_profile", args=[profile_user.id]))
 
     user_works = Work.objects.filter(author=profile_user).order_by("-date_published")
     total_works = user_works.count()
     total_views = user_works.aggregate(models.Sum("views"))["views__sum"] or 0
     total_likes = user_works.aggregate(models.Sum("likes"))["likes__sum"] or 0
-    # Check if current user is viewing their own profile
     is_own_profile = request.user.is_authenticated and request.user == profile_user
     context = {
         "profile_user": profile_user,
@@ -390,25 +388,28 @@ def is_manager(user):
 @user_passes_test(is_manager, login_url="main")
 def manager_panel(request):
     """Manager panel for managing collections and feedback"""
-    collections = Collection.objects.filter(created_by=request.user).order_by("-created_at")
+    collections = Collection.objects.filter(created_by=request.user).order_by(
+        "-created_at"
+    )
 
-    # Show feedbacks with status 'new' or assigned to this manager and status 'processing'
     feedbacks = FeedbackForm.objects.filter(
-        Q(status='new') | (Q(status='processing') & Q(processing_by=request.user))
-    ).order_by('-date_submitted')
+        Q(status="new") | (Q(status="processing") & Q(processing_by=request.user))
+    ).order_by("-date_submitted")
 
     if request.method == "POST":
-        if request.POST.get('action') == 'process_feedback':
-            feedback_id = request.POST.get('feedback_id')
+        if request.POST.get("action") == "process_feedback":
+            feedback_id = request.POST.get("feedback_id")
             try:
-                feedback = FeedbackForm.objects.get(id=feedback_id, status='new')
-                feedback.status = 'processing'
+                feedback = FeedbackForm.objects.get(id=feedback_id, status="new")
+                feedback.status = "processing"
                 feedback.processing_by = request.user
                 from django.utils import timezone
+
                 feedback.processing_started_at = timezone.now()
                 feedback.save()
                 from django.urls import reverse
-                return redirect(reverse('feedback_detail', args=[feedback.id]))
+
+                return redirect(reverse("feedback_detail", args=[feedback.id]))
             except FeedbackForm.DoesNotExist:
                 pass
 
@@ -434,7 +435,6 @@ def create_collection(request):
                 collection.created_by = request.user
                 collection.save()
 
-                # Add selected works to collection
                 for work_id in selected_works:
                     try:
                         work = Work.objects.get(id=work_id)
@@ -444,7 +444,9 @@ def create_collection(request):
                     except Work.DoesNotExist:
                         pass
 
-                messages.success(request, f'Коллекция "{collection.name}" успешно создана!')
+                messages.success(
+                    request, f'Коллекция "{collection.name}" успешно создана!'
+                )
                 return redirect("manager_panel")
             except Exception as e:
                 messages.error(request, "Произошла ошибка при создании коллекции.")
@@ -453,7 +455,6 @@ def create_collection(request):
     else:
         form = CollectionForm()
 
-    # Get all available works for selection
     available_works = Work.objects.all().order_by("-date_published")
 
     context = {
@@ -491,14 +492,18 @@ def manage_collection(request, collection_id):
                         added_count += 1
                     except Work.DoesNotExist:
                         messages.error(request, f"Работа с ID {work_id} не найдена.")
-                
+
                 if added_count > 0:
                     if added_count == 1:
                         messages.success(request, f"1 работа добавлена в коллекцию.")
                     else:
-                        messages.success(request, f"{added_count} работ добавлено в коллекцию.")
+                        messages.success(
+                            request, f"{added_count} работ добавлено в коллекцию."
+                        )
             else:
-                messages.warning(request, "Пожалуйста, выберите хотя бы одну работу для добавления.")
+                messages.warning(
+                    request, "Пожалуйста, выберите хотя бы одну работу для добавления."
+                )
 
         elif action == "remove_work" and work_id:
             try:
@@ -516,12 +521,10 @@ def manage_collection(request, collection_id):
             messages.success(request, f'Коллекция "{collection_name}" удалена.')
             return redirect("manager_panel")
 
-    # Get works in this collection
     collection_works = CollectionWork.objects.filter(
         collection=collection
     ).select_related("work")
 
-    # Get all works not in this collection
     works_in_collection = [cw.work.id for cw in collection_works]
     available_works = Work.objects.exclude(id__in=works_in_collection).order_by(
         "-date_published"
@@ -544,7 +547,6 @@ def view_collection(request, collection_id):
         messages.error(request, "Коллекция не найдена.")
         return redirect("works")
 
-    # Get works in this collection
     collection_works = CollectionWork.objects.filter(
         collection=collection
     ).select_related("work")
@@ -573,13 +575,10 @@ def edit_collection(request, collection_id):
 
         if form.is_valid():
             try:
-                # Update collection details
                 form.save()
 
-                # Clear existing works and add new selections
                 CollectionWork.objects.filter(collection=collection).delete()
 
-                # Add selected works to collection
                 for work_id in selected_works:
                     try:
                         work = Work.objects.get(id=work_id)
@@ -589,7 +588,9 @@ def edit_collection(request, collection_id):
                     except Work.DoesNotExist:
                         pass
 
-                messages.success(request, f'Коллекция "{collection.name}" успешно обновлена!')
+                messages.success(
+                    request, f'Коллекция "{collection.name}" успешно обновлена!'
+                )
                 return redirect("manager_panel")
             except Exception as e:
                 messages.error(request, "Произошла ошибка при обновлении коллекции.")
@@ -598,10 +599,8 @@ def edit_collection(request, collection_id):
     else:
         form = CollectionForm(instance=collection)
 
-    # Get all available works
     available_works = Work.objects.all().order_by("-date_published")
 
-    # Get currently selected works
     selected_work_ids = [
         cw.work.id for cw in CollectionWork.objects.filter(collection=collection)
     ]
@@ -681,90 +680,105 @@ def manager_delete_work(request, work_id):
 @user_passes_test(is_manager, login_url="main")
 def feedback_detail(request, feedback_id):
     from django.shortcuts import get_object_or_404
+
     feedback = get_object_or_404(FeedbackForm, id=feedback_id)
 
-    # Allow manager to take feedback into processing from detail page
     if request.method == "POST":
-        if request.POST.get('action') == 'process_feedback' and feedback.status == 'new':
-            feedback.status = 'processing'
+        if (
+            request.POST.get("action") == "process_feedback"
+            and feedback.status == "new"
+        ):
+            feedback.status = "processing"
             feedback.processing_by = request.user
             from django.utils import timezone
+
             feedback.processing_started_at = timezone.now()
             feedback.save()
             from django.urls import reverse
-            return redirect(reverse('feedback_detail', args=[feedback.id]))
-        if request.POST.get('action') == 'resolve_feedback' and feedback.status == 'processing' and feedback.processing_by == request.user:
-            feedback.status = 'resolved'
+
+            return redirect(reverse("feedback_detail", args=[feedback.id]))
+        if (
+            request.POST.get("action") == "resolve_feedback"
+            and feedback.status == "processing"
+            and feedback.processing_by == request.user
+        ):
+            feedback.status = "resolved"
             from django.utils import timezone
+
             feedback.processing_ended_at = timezone.now()
             feedback.save()
             from django.contrib import messages
+
             messages.success(request, "Обращение отмечено как завершенное.")
             from django.urls import reverse
-            return redirect(reverse('manager_panel'))
+
+            return redirect(reverse("manager_panel"))
 
     context = {
-        'feedback': feedback,
+        "feedback": feedback,
     }
-    return render(request, 'feedback_detail.html', context)
+    return render(request, "feedback_detail.html", context)
 
 
 @login_required(login_url="register")
-@user_passes_test(lambda u: u.role == 'administrator', login_url="main")
+@user_passes_test(lambda u: u.role == "administrator", login_url="main")
 def admin_panel(request):
-    # User management
-    user_search = request.GET.get('user_search', '').strip()
-    users = User.objects.all().order_by('surname', 'name')
+    user_search = request.GET.get("user_search", "").strip()
+    users = User.objects.all().order_by("surname", "name")
     if user_search:
         users = users.filter(
-            Q(name__icontains=user_search) |
-            Q(surname__icontains=user_search) |
-            Q(email__icontains=user_search)
+            Q(name__icontains=user_search)
+            | Q(surname__icontains=user_search)
+            | Q(email__icontains=user_search)
         )
 
-    # Feedback filtering
-    status_filter = request.GET.get('status')
-    manager_filter = request.GET.get('manager')
-    feedbacks = FeedbackForm.objects.select_related('processing_by').all().order_by('-date_submitted')
+    status_filter = request.GET.get("status")
+    manager_filter = request.GET.get("manager")
+    feedbacks = (
+        FeedbackForm.objects.select_related("processing_by")
+        .all()
+        .order_by("-date_submitted")
+    )
     if status_filter:
         feedbacks = feedbacks.filter(status=status_filter)
     if manager_filter:
         feedbacks = feedbacks.filter(processing_by_id=manager_filter)
 
-    # Handle manager role assignment
-    if request.method == 'POST' and request.POST.get('action') == 'set_manager_role':
-        user_id = request.POST.get('user_id')
-        make_manager = request.POST.get('make_manager') == '1'
+    if request.method == "POST" and request.POST.get("action") == "set_manager_role":
+        user_id = request.POST.get("user_id")
+        make_manager = request.POST.get("make_manager") == "1"
         try:
             user = User.objects.get(id=user_id)
             if make_manager:
-                user.role = 'manager'
+                user.role = "manager"
             else:
-                user.role = 'user'
+                user.role = "user"
             user.save()
         except User.DoesNotExist:
             pass
         from django.urls import reverse
-        return redirect(reverse('admin_panel'))
 
-    managers = User.objects.filter(role='manager')
+        return redirect(reverse("admin_panel"))
+
+    managers = User.objects.filter(role="manager")
     context = {
-        'users': users,
-        'feedbacks': feedbacks,
-        'managers': managers,
-        'status_filter': status_filter,
-        'manager_filter': manager_filter,
-        'user_search': user_search,
+        "users": users,
+        "feedbacks": feedbacks,
+        "managers": managers,
+        "status_filter": status_filter,
+        "manager_filter": manager_filter,
+        "user_search": user_search,
     }
-    return render(request, 'admin_panel.html', context)
+    return render(request, "admin_panel.html", context)
 
 
 @login_required(login_url="register")
-@user_passes_test(lambda u: u.role == 'administrator', login_url="main")
+@user_passes_test(lambda u: u.role == "administrator", login_url="main")
 def admin_feedback_detail(request, feedback_id):
     from django.shortcuts import get_object_or_404
+
     feedback = get_object_or_404(FeedbackForm, id=feedback_id)
     context = {
-        'feedback': feedback,
+        "feedback": feedback,
     }
-    return render(request, 'admin_feedback_detail.html', context)
+    return render(request, "admin_feedback_detail.html", context)

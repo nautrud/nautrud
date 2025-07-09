@@ -154,7 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const coverPreview = document.getElementById('cover-preview');
     const previewImage = document.getElementById('preview-image');
     
-    // Cover image preview
     if (coverInput) {
         coverInput.addEventListener('change', function() {
             const file = this.files[0];
@@ -171,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Work search functionality
     if (searchInput && worksContainer) {
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase().trim();

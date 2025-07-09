@@ -61,11 +61,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.surname} {self.name} ({self.email})"
-    
+
     def save(self, *args, **kwargs):
-        # Set date_joined for new users
         if not self.pk and not self.date_joined:
             from django.utils import timezone
+
             self.date_joined = timezone.now()
         super().save(*args, **kwargs)
 
@@ -74,21 +74,24 @@ class Collection(models.Model):
     name = models.CharField("Название коллекции", max_length=200)
     description = models.TextField("Описание", blank=True)
     cover_image = models.ImageField(
-        "Обложка коллекции", 
-        upload_to='collections/covers/', 
-        blank=True, 
+        "Обложка коллекции",
+        upload_to="collections/covers/",
+        blank=True,
         null=True,
-        help_text="Загрузите изображение обложки для коллекции (необязательно)"
+        help_text="Загрузите изображение обложки для коллекции (необязательно)",
     )
     tags = models.CharField(
-        "Теги/Категории", 
-        max_length=500, 
-        blank=True, 
+        "Теги/Категории",
+        max_length=500,
+        blank=True,
         null=True,
-        help_text="Введите теги через запятую (например: математика, физика, исследование)"
+        help_text="Введите теги через запятую (например: математика, физика, исследование)",
     )
     created_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="collections", verbose_name="Создатель"
+        User,
+        on_delete=models.CASCADE,
+        related_name="collections",
+        verbose_name="Создатель",
     )
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
     updated_at = models.DateTimeField("Дата обновления", auto_now=True)
@@ -96,7 +99,7 @@ class Collection(models.Model):
     class Meta:
         verbose_name = "Коллекция"
         verbose_name_plural = "Коллекции"
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.name
@@ -113,25 +116,25 @@ class Work(models.Model):
     likes = models.PositiveIntegerField("Лайки", default=0)
     views = models.PositiveIntegerField("Просмотры", default=0)
     tags = models.CharField(
-        "Теги/Категории", 
-        max_length=500, 
-        blank=True, 
+        "Теги/Категории",
+        max_length=500,
+        blank=True,
         null=True,
-        help_text="Введите теги через запятую (например: математика, физика, исследование)"
+        help_text="Введите теги через запятую (например: математика, физика, исследование)",
     )
     cover_image = models.ImageField(
-        "Обложка работы", 
-        upload_to='works/covers/', 
-        blank=True, 
+        "Обложка работы",
+        upload_to="works/covers/",
+        blank=True,
         null=True,
-        help_text="Загрузите изображение обложки для вашей работы (необязательно)"
+        help_text="Загрузите изображение обложки для вашей работы (необязательно)",
     )
     pdf_file = models.FileField(
-        "PDF файл", 
-        upload_to='works/pdfs/', 
-        blank=True, 
+        "PDF файл",
+        upload_to="works/pdfs/",
+        blank=True,
         null=True,
-        help_text="Загрузите PDF файл вашей работы (необязательно)"
+        help_text="Загрузите PDF файл вашей работы (необязательно)",
     )
 
     class Meta:
@@ -144,21 +147,30 @@ class Work(models.Model):
 
 class CollectionWork(models.Model):
     collection = models.ForeignKey(
-        Collection, on_delete=models.CASCADE, related_name="collection_works", verbose_name="Коллекция"
+        Collection,
+        on_delete=models.CASCADE,
+        related_name="collection_works",
+        verbose_name="Коллекция",
     )
     work = models.ForeignKey(
-        Work, on_delete=models.CASCADE, related_name="work_collections", verbose_name="Работа"
+        Work,
+        on_delete=models.CASCADE,
+        related_name="work_collections",
+        verbose_name="Работа",
     )
     added_at = models.DateTimeField("Дата добавления", auto_now_add=True)
     added_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="added_works", verbose_name="Добавил"
+        User,
+        on_delete=models.CASCADE,
+        related_name="added_works",
+        verbose_name="Добавил",
     )
 
     class Meta:
         verbose_name = "Работа в коллекции"
         verbose_name_plural = "Работы в коллекциях"
-        unique_together = ['collection', 'work']  # Prevent duplicate entries
-        ordering = ['-added_at']
+        unique_together = ["collection", "work"]
+        ordering = ["-added_at"]
 
     def __str__(self):
         return f"{self.work.name} в коллекции {self.collection.name}"
@@ -180,21 +192,22 @@ class FeedbackForm(models.Model):
         ("resolved", "Завершена"),
     ]
     status = models.CharField(
-        "Статус",
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default="new"
+        "Статус", max_length=20, choices=STATUS_CHOICES, default="new"
     )
     processing_by = models.ForeignKey(
-        'User',
+        "User",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='processing_feedbacks',
-        verbose_name="Обрабатывает менеджер"
+        related_name="processing_feedbacks",
+        verbose_name="Обрабатывает менеджер",
     )
-    processing_started_at = models.DateTimeField("Начало обработки", null=True, blank=True)
-    processing_ended_at = models.DateTimeField("Окончание обработки", null=True, blank=True)
+    processing_started_at = models.DateTimeField(
+        "Начало обработки", null=True, blank=True
+    )
+    processing_ended_at = models.DateTimeField(
+        "Окончание обработки", null=True, blank=True
+    )
 
     class Meta:
         verbose_name = "Форма обратной связи"

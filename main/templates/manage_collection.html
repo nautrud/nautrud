@@ -5,7 +5,6 @@
 
 {% block content %}
 <div class="container mt-5">
-    <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="collection-header-card">
@@ -45,7 +44,6 @@
     </div>
 
     <div class="row">
-        <!-- Works in Collection -->
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
@@ -103,7 +101,6 @@
             </div>
         </div>
 
-        <!-- Add Works to Collection -->
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
@@ -113,13 +110,11 @@
                 </div>
                 <div class="card-body">
                     {% if available_works %}
-                        <!-- Search Box -->
                         <div class="mb-3">
                             <label for="workSearch" class="form-label">Поиск работ:</label>
                             <input type="text" class="form-control" id="workSearch" placeholder="Введите название работы или автора...">
                         </div>
                         
-                        <!-- Works List -->
                         <div class="works-list-container" style="max-height: 400px; overflow-y: auto;">
                             <form method="post" id="addWorksForm">
                                 {% csrf_token %}
@@ -159,7 +154,6 @@
                             </form>
                         </div>
                         
-                        <!-- Show More Button -->
                         {% if available_works.count > 3 %}
                         <div class="text-center mt-3">
                             <button type="button" class="btn btn-outline-secondary btn-sm" id="showMoreBtn">
@@ -177,7 +171,6 @@
                 </div>
             </div>
 
-            <!-- Collection Info -->
             <div class="card mt-3">
                 <div class="card-header">
                     <h6 class="mb-0">
@@ -202,7 +195,6 @@
     </div>
 </div>
 
-<!-- Delete Collection Modal -->
 <div class="modal fade" id="deleteCollectionModal" tabindex="-1" aria-labelledby="deleteCollectionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -226,89 +218,6 @@
     </div>
 </div>
 
-<style>
-.collection-header-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    margin-bottom: 1rem;
-}
-
-.work-item-card {
-    background: #ffffff;
-    transition: all 0.3s ease;
-    border: 1px solid #dee2e6 !important;
-}
-
-.work-item-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-color: #007bff !important;
-}
-
-.card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    border: 1px solid rgba(0, 0, 0, 0.125);
-}
-
-.card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-}
-
-.form-label {
-    font-weight: 500;
-    color: #495057;
-}
-
-.btn {
-    border-radius: 0.375rem;
-}
-
-@media (max-width: 768px) {
-    .collection-header-card .row {
-        text-align: center;
-    }
-    
-    .collection-header-card .col-md-4 {
-        margin-top: 1rem;
-    }
-}
-
-/* Works selection styles */
-.work-item-selectable {
-    background: #ffffff;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: 1px solid #dee2e6 !important;
-}
-
-.work-item-selectable:hover {
-    background-color: #f8f9fa;
-    border-color: #007bff !important;
-}
-
-.work-item-selectable.selected {
-    background-color: #e3f2fd;
-    border-color: #007bff !important;
-}
-
-.work-item-selectable.hidden {
-    display: none;
-}
-
-.works-list-container {
-    border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-    background-color: #f8f9fa;
-}
-
-.works-list {
-    padding: 0.5rem;
-}
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const workSearch = document.getElementById('workSearch');
@@ -318,7 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const showMoreBtn = document.getElementById('showMoreBtn');
     const workCheckboxes = document.querySelectorAll('.work-checkbox');
     
-    // Search functionality
     if (workSearch) {
         workSearch.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
@@ -336,11 +244,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Work item selection
     workItems.forEach(item => {
         const checkbox = item.querySelector('.work-checkbox');
         
-        // Click on item to select/deselect
         item.addEventListener('click', function(e) {
             if (e.target !== checkbox) {
                 checkbox.checked = !checkbox.checked;
@@ -348,13 +254,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Click on checkbox
         checkbox.addEventListener('change', function() {
             updateSelection();
         });
     });
     
-    // Update selection state
     function updateSelection() {
         const checkedBoxes = document.querySelectorAll('.work-checkbox:checked');
         addSelectedBtn.disabled = checkedBoxes.length === 0;
@@ -369,11 +273,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Show more works functionality
     if (showMoreBtn) {
         showMoreBtn.addEventListener('click', function() {
-            // This would typically load more works via AJAX
-            // For now, we'll just show a message
             this.innerHTML = '<i class="bi bi-check"></i> Все работы показаны';
             this.disabled = true;
             this.classList.remove('btn-outline-secondary');
@@ -381,7 +282,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Form submission
     const addWorksForm = document.getElementById('addWorksForm');
     if (addWorksForm) {
         addWorksForm.addEventListener('submit', function(e) {

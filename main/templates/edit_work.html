@@ -12,7 +12,6 @@
                 {% endif %}
             </h1>
             
-            <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'main' %}" class="text-decoration-none">Главная</a></li>
@@ -27,7 +26,6 @@
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         
-                        <!-- Display form errors -->
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger mb-4">
                                 {% for error in form.non_field_errors %}
@@ -150,7 +148,6 @@
                 </div>
             </div>
             
-            <!-- Guidelines Section -->
             <div class="mt-5">
                 <h3 class="fw-bold mb-3">Рекомендации по редактированию</h3>
                 <div class="row g-4">

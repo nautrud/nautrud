@@ -5,7 +5,6 @@
 
 {% block content %}
 <div class="container-custom my-5">
-    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'main' %}" class="text-decoration-none">Главная</a></li>
@@ -15,7 +14,6 @@
         </ol>
     </nav>
 
-    <!-- Collection Header -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="collection-header">
@@ -39,7 +37,7 @@
                                 {% endif %}
                             </h1>
                             {% if collection.description %}
-                                <p class="lead text-muted mb-3">{{ collection.description }}</p>
+                                <p class="lead text-muted mb-3 fw-semibold">{{ collection.description }}</p>
                             {% endif %}
                             {% if collection.tags %}
                                 <div class="mb-3">
@@ -68,10 +66,8 @@
     </div>
 
     {% if user.is_authenticated and user.role == 'manager' %}
-        <!-- Removed old button location -->
     {% endif %}
 
-    <!-- Works in Collection -->
     {% if collection_works %}
         <div class="row g-4">
             {% for collection_work in collection_works %}
@@ -134,22 +130,4 @@
     {% endif %}
 
 </div>
-
-<style>
-.collection-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    margin-bottom: 2rem;
-}
-
-.collection-meta a {
-    color: #b07d4a;
-}
-
-.collection-meta a:hover {
-    color: #8a5e2e;
-}
-</style>
 {% endblock %} 

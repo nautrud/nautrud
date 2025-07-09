@@ -8,7 +8,6 @@
         <form method="post" class="p-4 border rounded-4 shadow-sm bg-white">
             {% csrf_token %}
             
-            <!-- Display form errors -->
             {% if form.non_field_errors %}
                 <div class="alert alert-danger mb-3">
                     {% for error in form.non_field_errors %}

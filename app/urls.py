@@ -30,17 +30,38 @@ urlpatterns = [
     path("works/<int:work_id>/edit/", views.edit_work, name="edit_work"),
     path("works/<int:work_id>/delete/", views.delete_work, name="delete_work"),
     path("works/<int:work_id>/like/", views.like_work, name="like_work"),
-    path("collections/<int:collection_id>/", views.view_collection, name="view_collection"),
+    path(
+        "collections/<int:collection_id>/",
+        views.view_collection,
+        name="view_collection",
+    ),
     path("profile/", views.profile, name="profile"),
     path("profile/<int:user_id>/", views.profile, name="user_profile"),
     path("profile/edit/", views.edit_profile, name="edit_profile"),
-    # Manager URLs
     path("manager/", views.manager_panel, name="manager_panel"),
-    path("manager/collection/create/", views.create_collection, name="create_collection"),
-    path("manager/collection/<int:collection_id>/", views.manage_collection, name="manage_collection"),
-    path("manager/collection/<int:collection_id>/edit/", views.edit_collection, name="edit_collection"),
-    path("manager/work/<int:work_id>/edit/", views.manager_edit_work, name="manager_edit_work"),
-    path("manager/work/<int:work_id>/delete/", views.manager_delete_work, name="manager_delete_work"),
+    path(
+        "manager/collection/create/", views.create_collection, name="create_collection"
+    ),
+    path(
+        "manager/collection/<int:collection_id>/",
+        views.manage_collection,
+        name="manage_collection",
+    ),
+    path(
+        "manager/collection/<int:collection_id>/edit/",
+        views.edit_collection,
+        name="edit_collection",
+    ),
+    path(
+        "manager/work/<int:work_id>/edit/",
+        views.manager_edit_work,
+        name="manager_edit_work",
+    ),
+    path(
+        "manager/work/<int:work_id>/delete/",
+        views.manager_delete_work,
+        name="manager_delete_work",
+    ),
     path("feedback", views.feedback, name="feedback"),
     path("contacts", views.contacts, name="contacts"),
     path("login", views.user_login, name="login"),
@@ -48,11 +69,18 @@ urlpatterns = [
     path("logout", views.user_logout, name="logout"),
     path("upload", views.upload, name="upload"),
     path("faq", views.faq, name="faq"),
-    path("manager/feedback/<int:feedback_id>/", views.feedback_detail, name="feedback_detail"),
+    path(
+        "manager/feedback/<int:feedback_id>/",
+        views.feedback_detail,
+        name="feedback_detail",
+    ),
     path("admin_panel/", views.admin_panel, name="admin_panel"),
-    path("admin_panel/feedback/<int:feedback_id>/", views.admin_feedback_detail, name="admin_feedback_detail"),
+    path(
+        "admin_panel/feedback/<int:feedback_id>/",
+        views.admin_feedback_detail,
+        name="admin_feedback_detail",
+    ),
 ]
 
-# Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
