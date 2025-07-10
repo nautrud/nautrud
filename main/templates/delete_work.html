@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Удалить работу — trud.ru{% endblock %}
+{% block title %}Удалить работу{% endblock %}
 {% block content %}
 <div class="container-custom my-5">
     <div class="row justify-content-center">
@@ -40,7 +40,7 @@
                         <h6 class="fw-bold mb-2">⚠️ Внимание!</h6>
                         <ul class="mb-0">
                             <li>Это действие нельзя отменить</li>
-                            <li>Работа будет удалена навсегда</li>
+                            <li>Научная работа будет удалена навсегда</li>
                             <li>Все файлы (PDF, обложка) будут удалены</li>
                             <li>Комментарии и лайки будут потеряны</li>
                         </ul>
@@ -53,7 +53,7 @@
                                 <i class="bi bi-arrow-left me-2"></i>Отмена
                             </a>
                             <button type="submit" class="btn btn-danger">
-                                <i class="bi bi-trash me-2"></i>Удалить работу
+                                <i class="bi bi-trash me-2"></i>Удалить научную работу
                             </button>
                         </div>
                     </form>
@@ -62,7 +62,7 @@
             
             <div class="mt-4 text-center">
                 <p class="text-muted small">
-                    Если вы хотите скрыть работу, но сохранить её, рассмотрите возможность редактирования вместо удаления.
+                    Если вы хотите скрыть научную работу, но сохранить её, рассмотрите возможность редактирования вместо удаления.
                 </p>
                 <a href="{% url 'edit_work' work.id %}" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-pencil me-1"></i>Редактировать вместо удаления

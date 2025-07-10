@@ -12,28 +12,28 @@ class FeedbackFormForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Введите ваше имя",
+                    "placeholder": "Имя",
                     "required": True,
                 }
             ),
             "email": forms.EmailInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Введите ваш e-mail",
+                    "placeholder": "E-mail",
                     "required": True,
                 }
             ),
             "phone": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Введите номер телефона",
+                    "placeholder": "Номер телефона",
                     "required": True,
                 }
             ),
             "student_number": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Введите номер, если есть",
+                    "placeholder": "Номер студента",
                 }
             ),
             "description": forms.Textarea(
@@ -52,7 +52,7 @@ class FeedbackFormForm(forms.ModelForm):
             "student_number": "Номер студента или преподавателя",
             "description": "Описание",
         }
-        help_texts = {"student_number": "(необязательно)"}
+        help_texts = {"student_number": "необязательно"}
 
     def clean_phone(self):
         phone = self.cleaned_data.get("phone")
@@ -258,7 +258,7 @@ class UserRegistrationForm(forms.ModelForm):
     password1 = forms.CharField(
         label="Пароль",
         widget=forms.PasswordInput(
-            attrs={"class": "form-control", "placeholder": "пароль", "required": True}
+            attrs={"class": "form-control", "placeholder": "Пароль", "required": True}
         ),
     )
     password2 = forms.CharField(
@@ -266,7 +266,7 @@ class UserRegistrationForm(forms.ModelForm):
         widget=forms.PasswordInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "подтвердите пароль",
+                "placeholder": "Подтвердите пароль",
                 "required": True,
             }
         ),
@@ -277,26 +277,26 @@ class UserRegistrationForm(forms.ModelForm):
         fields = ["name", "surname", "email", "student_number"]
         widgets = {
             "name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "имя", "required": True}
+                attrs={"class": "form-control", "placeholder": "Имя", "required": True}
             ),
             "surname": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "фамилия",
+                    "placeholder": "Фамилия",
                     "required": True,
                 }
             ),
             "email": forms.EmailInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "e-mail",
+                    "placeholder": "Е-mail",
                     "required": True,
                 }
             ),
             "student_number": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "номер студента",
+                    "placeholder": "Номер студента",
                     "required": True,
                 }
             ),
@@ -333,13 +333,13 @@ class UserLoginForm(AuthenticationForm):
     username = forms.EmailField(
         label="Электронная почта",
         widget=forms.EmailInput(
-            attrs={"class": "form-control", "placeholder": "e-mail", "required": True}
+            attrs={"class": "form-control", "placeholder": "E-mail", "required": True}
         ),
     )
     password = forms.CharField(
         label="Пароль",
         widget=forms.PasswordInput(
-            attrs={"class": "form-control", "placeholder": "пароль", "required": True}
+            attrs={"class": "form-control", "placeholder": "Пароль", "required": True}
         ),
     )
 

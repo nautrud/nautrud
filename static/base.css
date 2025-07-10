@@ -45,12 +45,11 @@ footer {
 
 .navbar-brand {
     color: #7c6650 !important;
-    font-family: 'Impact', 'Georgia', 'Times New Roman', serif;
+    font-family: 'Circe', sans-serif;
     font-size: 1.75rem !important;
-    font-weight: 300 !important;
+    font-weight: 700 !important;
     text-decoration: none;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -644,4 +643,14 @@ a:hover, a:focus {
 .view-selector-item span {
     font-weight: 600;
     font-size: 0.85rem;
+}  
+
+input::placeholder,
+textarea::placeholder {
+    color: #aaa !important;
+    opacity: 0.7 !important;
+    font-weight: 300 !important;
+    font-size: 0.85rem !important;
+    font-family: 'Roboto', Arial, sans-serif !important;
+    /* text-transform: capitalize !important; */
 }  

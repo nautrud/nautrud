@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load custom_filters %}
-{% block title %}{{ work.name }} — trud.ru{% endblock %}
+{% block title %}{{ work.name }}{% endblock %}
 {% block content %}
 <div class="container-custom my-5">
     <nav aria-label="breadcrumb" class="mb-4">
@@ -57,7 +57,7 @@
 
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <h3 class="fw-bold mb-3">Описание работы</h3>
+                    <h3 class="fw-bold mb-3">Описание научной работы</h3>
                     <div class="work-description">
                         {{ work.long_description|linebreaks }}
                     </div>
@@ -157,7 +157,7 @@
 
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3">Другие работы автора</h5>
+                    <h5 class="fw-bold mb-3">Другие научные работы автора</h5>
                     {% for other_work in work.author.works.all|slice:":3" %}
                         {% if other_work.id != work.id %}
                         <div class="other-work-item mb-3">
@@ -181,7 +181,7 @@
                         </div>
                         {% endif %}
                     {% empty %}
-                        <p class="text-muted small">Других работ пока нет</p>
+                        <p class="text-muted small">Других научных работ пока нет</p>
                     {% endfor %}
                 </div>
             </div>
@@ -202,7 +202,7 @@
             {% if collections %}
             <div class="card border-0 shadow-sm mb-4 mt-4">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3">Коллекции с этой работой</h5>
+                    <h5 class="fw-bold mb-3">Коллекции с этой научной работой</h5>
                     <ul class="list-unstyled mb-0">
                         {% for collection in collections %}
                         <li class="mb-2">

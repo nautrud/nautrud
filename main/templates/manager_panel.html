@@ -43,7 +43,7 @@
                                     {% endif %}
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <small class="text-muted">
-                                            {{ collection.collection_works.count }} работ
+                                            Документов: {{ collection.collection_works.count }}
                                         </small>
                                         <small class="text-muted">
                                             {{ collection.created_at|date:"d.m.Y" }}
@@ -65,7 +65,7 @@
                         <div class="text-center py-4">
                             <i class="bi bi-collection text-muted" style="font-size: 3rem;"></i>
                             <h5 class="mt-3 text-muted">У вас пока нет коллекций</h5>
-                            <p class="text-muted">Создайте свою первую коллекцию для организации работ</p>
+                            <p class="text-muted">Создайте свою первую коллекцию для организации научных работ</p>
                             <a href="{% url 'create_collection' %}" class="btn btn-primary">
                                 <i class="bi bi-plus-circle"></i> Создать коллекцию
                             </a>

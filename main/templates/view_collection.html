@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
 
-{% block title %}{{ collection.name }} — trud.ru{% endblock %}
+{% block title %}{{ collection.name }}{% endblock %}
 
 {% block content %}
 <div class="container-custom my-5">
@@ -55,7 +55,7 @@
                                     <span class="mx-2">•</span>
                                     <i class="bi bi-calendar"></i> {{ collection.created_at|date:"d.m.Y" }}
                                     <span class="mx-2">•</span>
-                                    <i class="bi bi-collection"></i> {{ collection_works.count }} работ
+                                    <i class="bi bi-collection"></i> Документов: {{ collection_works.count }}
                                 </small>
                             </div>
                         </div>
@@ -109,7 +109,7 @@
                             </div>
                         </div>
                         <div class="d-flex gap-2 mt-auto">
-                            <a href="{% url 'work_detail' collection_work.work.id %}" class="btn btn-primary custom-main">Читать работу</a>
+                            <a href="{% url 'work_detail' collection_work.work.id %}" class="btn btn-primary custom-main">Читать научную работу</a>
                             {% if collection_work.work.pdf_file %}
                                 <a href="{{ collection_work.work.pdf_file.url }}" class="btn btn-outline-primary custom-main" target="_blank" download>
                                     📄 PDF
@@ -125,7 +125,7 @@
         <div class="text-center py-5">
             <i class="bi bi-collection text-muted" style="font-size: 3rem;"></i>
             <h3 class="text-muted mt-3">Коллекция пуста</h3>
-            <p class="text-muted">В этой коллекции пока нет работ.</p>
+            <p class="text-muted">В этой коллекции пока нет научных работ.</p>
         </div>
     {% endif %}
 
